@@ -7,6 +7,7 @@ import { ObjectId } from 'bson';
 /**
  * Get one experiment's data by token.
  * @param {Token} jwt - User's token.
+ * @return {Experiment} - The experiment's data.
  */
 
 const getOneExperimentToken = async (req: Request, res: Response) => {

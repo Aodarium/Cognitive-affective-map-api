@@ -38,7 +38,7 @@ const submitExperiment = async (req: Request, res: Response) => {
     }
 
     //Checks if mother exist and breaks if not
-    const experimentMother: any = collections.experiments?.findOne(
+    const experimentMother = collections.experiments?.findOne(
         { _id: new ObjectId(idMother) }
     );
     if (!experimentMother) {

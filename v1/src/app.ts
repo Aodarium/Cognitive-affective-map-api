@@ -4,21 +4,22 @@ import participantsRoutes from "./routes/participants";
 import researchersRoutes from "./routes/researchers";
 import morgan from 'morgan';
 import helmet from "helmet";
-
 import fs from "fs";
 import path from 'path';
 
 const app: Express = express();
 let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 
-
 connectToDatabase();
 
-var RateLimit = require('express-rate-limit');
-var limiter = RateLimit({
+let RateLimit = require('express-rate-limit');
+let limiter = RateLimit({
   windowMs: 1*60*1000, // 1 minute
   max: 20
 });
+
+//  add documentation to the api
+
 
 app.use(limiter);
 app.use(morgan('common', { stream: accessLogStream }));
