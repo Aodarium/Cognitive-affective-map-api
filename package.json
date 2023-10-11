@@ -24,7 +24,8 @@
   "main": "server.ts",
   "scripts": {
     "dev": "nodemon server.ts",
-    "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc"
+    "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
+    "start": "node build/server.js"
   },
   "husky": {
     "hooks": {
