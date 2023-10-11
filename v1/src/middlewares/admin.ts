@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { verify } from "jsonwebtoken";
 import endpoint from '../../endpoints.config';
 
-module.exports = (req: Request, res: Response, next: NextFunction) => {
+function isAdmin(req: Request, res: Response, next: NextFunction) {
     verify(req.body?.jwt, endpoint.KEY_JWT, async (err: any, decoded: any) => {
         if (!err && decoded) {
             req.body.decoded = decoded;
@@ -16,3 +16,4 @@ module.exports = (req: Request, res: Response, next: NextFunction) => {
         }
     });
 };
+export default isAdmin;

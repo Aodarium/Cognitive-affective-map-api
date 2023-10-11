@@ -11,8 +11,8 @@ import deleteExperiment from '../controllers/researcher/deleteExperiment';
 import updateUserRole from '../controllers/researcher/updateUserRole';
 import updateUserPaid from '../controllers/researcher/updateUserPaid';
 
-const isAdmin = require("../middlewares/admin");
-const isAuth = require("../middlewares/auth");
+import isAdmin from "../middlewares/admin";
+import isAuth from "../middlewares/auth";
 
 router.post("/login", login);
 
