@@ -1,5 +1,5 @@
-const http = require('http');
-const app  = require('./v1/src/app');
+import http from 'http';
+import app from './v1/src/app';
 
 const httpServer = http.createServer(app);
 const PORT: number = process.env.PORT as unknown as number ?? 3001;
