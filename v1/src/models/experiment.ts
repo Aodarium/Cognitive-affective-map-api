@@ -1,13 +1,18 @@
 import { ObjectId } from "mongodb";
 import Daughter from "./daughter";
 
-export default interface Experiment {
+export enum Status {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE",
+    ARCHIVED = "ARCHIVED",
+}
+export interface Experiment {
     name: string;
     researcherID: ObjectId;
     creationDate: Date;
     cam: string;
     config: string;
     link: string;
-    status: string;
+    status: Status;
     daughters: Daughter[];
 }

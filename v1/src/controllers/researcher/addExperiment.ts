@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { collections } from "../../services/connect";
-import { ObjectId } from 'bson';
-import Experiment from "../../models/experiment";
+import { ObjectId } from "bson";
+import { Experiment, Status } from "../../models/experiment";
 
 /**
  * Add an experiment.
@@ -11,14 +11,13 @@ import Experiment from "../../models/experiment";
  */
 
 const addExperiment = async (req: Request, res: Response) => {
-
     const decoded = req.body?.decoded;
-    const name: string = req.body?.name as string ?? '';
-    const link: string = req.body?.link as string ?? '';
-    const camFileRaw: string = req.body?.cam as string ?? '';
+    const name: string = (req.body?.name as string) ?? "";
+    const link: string = (req.body?.link as string) ?? "";
+    const camFileRaw: string = (req.body?.cam as string) ?? "";
     const camFile = JSON.parse(camFileRaw);
-    const cam = camFile?.CAM ?? '';
-    const configcam = camFile?.config ?? '';
+    const cam = camFile?.CAM ?? "";
+    const configcam = camFile?.config ?? "";
 
     if (!name || !cam || !configcam || !link) {
         res.status(401).json({ message: "Invalid content" });
@@ -26,7 +25,6 @@ const addExperiment = async (req: Request, res: Response) => {
     }
 
     try {
-
         const experiment: Experiment = {
             name: name,
             researcherID: new ObjectId(decoded.userId),
@@ -34,15 +32,20 @@ const addExperiment = async (req: Request, res: Response) => {
             config: JSON.stringify(configcam),
             cam: JSON.stringify(cam),
             link: link,
-            status: "inactive",
+            status: Status.INACTIVE,
             daughters: [],
         };
 
         const result = await collections.experiments?.insertOne(experiment);
         result
-            ? res.status(201).send({ message: `Experiment added successfully ${result.insertedId}` })
-            : res.status(500).send({ message: "Failed to create a new experiment." });
-
+            ? res
+                  .status(201)
+                  .send({
+                      message: `Experiment added successfully ${result.insertedId}`,
+                  })
+            : res
+                  .status(500)
+                  .send({ message: "Failed to create a new experiment." });
     } catch (err) {
         res.status(500).json({ message: err });
     }

@@ -1,27 +1,33 @@
 import { Request, Response } from "express";
-import Experiment from "../../models/experiment";
+import { Experiment, Status } from "../../models/experiment";
 import { Researcher } from "../../models/researcher";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
+import { Wrapper } from "../../models/generals";
 
+interface ExpNewInputModel {
+    decoded: any;
+    status: Status;
+    id: string;
+}
 /**
  * Change the status of one experiment you owned.
- * @param {ObjectId}  MotherId - Id of the experiment to change.
- * @param {Token} jwtToken - Token from the user.
+ * @param {String}  userId - Id of the experiment to change.
+ * @param {Status}  status - Id of the experiment to change.
+ * @param {String} id - Token from the user.
  */
 
-const changeExperimentStatus = async (req: Request, res: Response) => {
-    const decoded: any = req.body?.decoded ?? "";
-    const newStatus: string = (req?.body?.status as string) ?? "inactive";
-    const idExperiment: string = (req.body?.id as string) ?? "";
+const changeExperimentStatus = async (
+    req: Wrapper<ExpNewInputModel>,
+    res: Response
+) => {
+    const userId: string = req.body.decoded.userId;
+    const newStatus: Status = req.body.status;
+    const idExperiment: string = req.body.id;
 
-    if (
-        ["inactive", "active", "completed", "archived"].indexOf(newStatus) ===
-        -1
-    ) {
+    if (!Object.values(Status).includes(newStatus)) {
         res.status(409).json({
-            message:
-                "Chose a valid status from: inactive, active, completed, archived",
+            message: "Chose a valid status from: inactive, active, archived",
         });
         return;
     }
@@ -44,7 +50,7 @@ const changeExperimentStatus = async (req: Request, res: Response) => {
 
     //update the status of other experiments based on the user's paid value
     const researcher = (await collections.researchers?.findOne({
-        _id: new ObjectId(decoded.userId),
+        _id: new ObjectId(userId),
     })) as Researcher;
 
     if (!researcher) {
@@ -53,13 +59,13 @@ const changeExperimentStatus = async (req: Request, res: Response) => {
     }
 
     //if no a paid user - only one experiment can run at  the time
-    if (researcher.paid === false && newStatus === "active") {
+    if (researcher.paid === false && newStatus === Status.ACTIVE) {
         await collections.experiments?.updateMany(
             {
-                researcherID: new ObjectId(decoded.userId),
-                status: "active",
+                researcherID: new ObjectId(userId),
+                status: Status.ACTIVE,
             },
-            { $set: { status: "inactive" } }
+            { $set: { status: Status.INACTIVE } }
         );
     }
 

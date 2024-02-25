@@ -1,0 +1,128 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "Camel",
+    "dateExported": "2024-02-25T14:59:06.223Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "b09dd173-f498-4b43-accf-212109b99fee",
+            "name": "researcher",
+            "containerId": "",
+            "created": "2024-02-25T14:09:29.674Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "a4788c93-6451-4e37-a320-cd009744e5eb",
+            "name": "Login",
+            "containerId": "b09dd173-f498-4b43-accf-212109b99fee",
+            "created": "2024-02-25T14:54:57.531Z",
+            "sortNum": 20000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "2917f729-e278-4664-98ec-490fab0fc663",
+            "colId": "aaaeb762-e5ac-4287-8e91-70a536499cfe",
+            "containerId": "a4788c93-6451-4e37-a320-cd009744e5eb",
+            "name": "Success",
+            "url": "localhost:3001/researchers/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-02-25T14:09:19.889Z",
+            "modified": "2024-02-25T14:15:04.028Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"zmatevushev0@yahoo.com\", \n  \"password\": \"8Uj2fPR\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "201"
+                }
+            ]
+        },
+        {
+            "_id": "0792a36b-45aa-4880-aaae-76c28d7fdf0d",
+            "colId": "aaaeb762-e5ac-4287-8e91-70a536499cfe",
+            "containerId": "a4788c93-6451-4e37-a320-cd009744e5eb",
+            "name": "Fail - wrong pwd",
+            "url": "localhost:3001/researchers/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-02-25T14:09:47.195Z",
+            "modified": "2024-02-25T14:14:24.169Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"zmatevushev0@yahoo.com\", \n  \"password\": \"8Uj2fPR-\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "cb296e06-505c-42b2-97c0-95543fc5f578",
+            "colId": "aaaeb762-e5ac-4287-8e91-70a536499cfe",
+            "containerId": "a4788c93-6451-4e37-a320-cd009744e5eb",
+            "name": "Fail - wrong email",
+            "url": "localhost:3001/researchers/login",
+            "method": "POST",
+            "sortNum": 25000,
+            "created": "2024-02-25T14:55:39.129Z",
+            "modified": "2024-02-25T14:58:28.554Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"zmatevushesv0@yahoo.com\", \n  \"password\": \"8Uj2fPR\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "c8c20920-023f-4c6f-844f-e6dff764dbaf",
+            "colId": "aaaeb762-e5ac-4287-8e91-70a536499cfe",
+            "containerId": "a4788c93-6451-4e37-a320-cd009744e5eb",
+            "name": "Fail - missing data",
+            "url": "localhost:3001/researchers/login",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-02-25T14:12:39.285Z",
+            "modified": "2024-02-25T14:12:53.546Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"email\": \"zmatevushev0@yahoo.com\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        }
+    ]
+}

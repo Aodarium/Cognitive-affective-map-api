@@ -6,20 +6,26 @@ import { collections } from "../../services/connect";
 import { Researcher } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
 
-interface UserModel {
+interface UserInputModel {
     email: string;
     password: string;
 }
 
-const login = async (req: Wrapper<UserModel>, res: Response) => {
-    const email: string = (req.body.email as string) ?? null;
-    const password: string = (req.body.password as string) ?? null;
+const login = async (req: Wrapper<UserInputModel>, res: Response) => {
+    const email: string = req.body.email as string;
+    const password: string = req.body.password as string;
+
+    if (!email || !password) {
+        res.status(401).json({ message: "Missing information" });
+        return;
+    }
+
     const user = (await collections.researchers?.findOne({
         email: email,
     })) as unknown as Researcher;
 
-    if (!user || !password) {
-        res.status(401).json({ message: "Missing information", token: "" });
+    if (!user) {
+        res.status(403).json({ message: "Invalide credentials" });
         return;
     }
 
@@ -29,7 +35,6 @@ const login = async (req: Wrapper<UserModel>, res: Response) => {
         if (err) {
             res.status(401).json({
                 message: "Authentification fail",
-                token: "",
             });
             return;
         }

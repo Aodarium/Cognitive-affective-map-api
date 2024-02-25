@@ -1,6 +1,6 @@
 import * as mongoDB from "mongodb";
 import endpoint from "../../endpoints.config";
-import Experiment from "../models/experiment";
+import { Experiment } from "../models/experiment";
 import Participant from "../models/participant";
 import { Researcher } from "../models/researcher";
 

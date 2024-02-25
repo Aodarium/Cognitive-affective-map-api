@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Experiment from "../../models/experiment";
+import { Experiment } from "../../models/experiment";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 

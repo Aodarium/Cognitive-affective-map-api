@@ -4,9 +4,10 @@ import { Researcher, Role } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
 import { collections } from "../../services/connect";
 
-interface UserModel {
+interface NewUserInputModel {
     email: string;
     password: string;
+    role: Role;
 }
 
 /**
@@ -16,10 +17,19 @@ interface UserModel {
  * @returns {Token} Returns a jwt token.
  */
 
-const signup = async (req: Wrapper<UserModel>, res: Response) => {
-    const email: string = (req.body.email as string) ?? "";
-    const password: string = (req.body.password as string) ?? "";
+const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
+    const email: string = req.body.email;
+    const password: string = req.body.password;
+    const role: Role = req.body.role;
 
+    if (!email || !password || !role) {
+        res.status(401).json({ message: "Mising information" });
+        return;
+    }
+    if (!Object.values(Role).includes(role)) {
+        res.status(401).json({ message: "Incorrect role" });
+        return;
+    }
     const existingResearcher = await collections.researchers?.findOne({
         email: email,
     });
@@ -31,14 +41,14 @@ const signup = async (req: Wrapper<UserModel>, res: Response) => {
     const hash = await bcrypt.hash(password, 10);
 
     if (!hash) {
-        res.status(500).json({ message: "err" });
+        res.status(500).json({ message: "Error while comparing pwd" });
         return;
     }
 
     const researcher: Researcher = {
         email: email,
         password: hash,
-        role: Role.researcher,
+        role: role,
         paid: false,
     };
 
@@ -47,7 +57,7 @@ const signup = async (req: Wrapper<UserModel>, res: Response) => {
             researcher
         );
         res.status(201).json({
-            message: `researcher created with id ${insertresult}`,
+            message: `researcher created with id ${insertresult?.insertedId}`,
         });
     } catch (err) {
         res.status(500).json({ message: err });

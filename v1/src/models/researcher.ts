@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
 
 export enum Role {
-    student = "student",
-    guest = "guest",
-    researcher = "researcher",
-    admin = "admin",
+    STUDENT = "STUDENT",
+    GUEST = "GUEST",
+    RESEARCHER = "RESEARCHER",
+    ADMIN = "ADMIN",
 }
 export interface Researcher {
     _id?: ObjectId;

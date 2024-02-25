@@ -3,7 +3,7 @@ import { sign } from "jsonwebtoken";
 import { ObjectId } from "bson";
 import endpoint from "../../../endpoints.config";
 import { collections } from "../../services/connect";
-import Experiment from "../../models/experiment";
+import { Experiment, Status } from "../../models/experiment";
 
 /**
  * Get one experiment by id.
@@ -39,7 +39,7 @@ const getOneExperiment = async (req: Request, res: Response) => {
     );
 
     //return null if the study is not active
-    if (experiment?.status != "active") {
+    if (experiment?.status != Status.ACTIVE) {
         return res
             .status(401)
             .json({ message: "This experiment is not active." });
