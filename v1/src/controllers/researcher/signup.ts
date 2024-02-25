@@ -1,20 +1,28 @@
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
-import Researcher from "../../models/researcher";
+import { Researcher, Role } from "../../models/researcher";
+import { Wrapper } from "../../models/generals";
 import { collections } from "../../services/connect";
 
+interface UserModel {
+    email: string;
+    password: string;
+}
+
 /**
- * To get the login token.
+ * Register an account.
  * @param {String} email - User's email.
  * @param {String} password - User's password.
  * @returns {Token} Returns a jwt token.
  */
 
-const signup = async (req: Request, res: Response) => {
-    const email: string = req.body?.email as string ?? '';
-    const password: string = req.body?.password as string ?? '';
+const signup = async (req: Wrapper<UserModel>, res: Response) => {
+    const email: string = (req.body.email as string) ?? "";
+    const password: string = (req.body.password as string) ?? "";
 
-    const existingResearcher = await collections.researchers?.findOne({ email: email });
+    const existingResearcher = await collections.researchers?.findOne({
+        email: email,
+    });
 
     if (existingResearcher) {
         res.status(409).json({ message: "Email taken" });
@@ -30,18 +38,21 @@ const signup = async (req: Request, res: Response) => {
     const researcher: Researcher = {
         email: email,
         password: hash,
-        role: "researcher",
-        paid: false
+        role: Role.researcher,
+        paid: false,
     };
 
     try {
-        const insertresult = await collections.researchers?.insertOne(researcher)
-        res.status(201).json({ message: `researcher created with id ${insertresult}` });
-    }
-    catch (err) {
+        const insertresult = await collections.researchers?.insertOne(
+            researcher
+        );
+        res.status(201).json({
+            message: `researcher created with id ${insertresult}`,
+        });
+    } catch (err) {
         res.status(500).json({ message: err });
     }
     return;
-}
+};
 
 export default signup;

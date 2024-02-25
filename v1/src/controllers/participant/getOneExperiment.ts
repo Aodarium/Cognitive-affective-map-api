@@ -1,8 +1,8 @@
-import {Request, Response} from "express";
-import {sign} from "jsonwebtoken";
-import {ObjectId} from 'bson';
-import endpoint from '../../../endpoints.config';
-import {collections} from "../../services/connect";
+import { Request, Response } from "express";
+import { sign } from "jsonwebtoken";
+import { ObjectId } from "bson";
+import endpoint from "../../../endpoints.config";
+import { collections } from "../../services/connect";
 import Experiment from "../../models/experiment";
 
 /**
@@ -14,18 +14,17 @@ import Experiment from "../../models/experiment";
  */
 
 const getOneExperiment = async (req: Request, res: Response) => {
-
-    const idExpToFetch: string = req.query?.id as string ?? "";
-    const participantID: string = req.query?.participantID as string ?? "";
+    const idExpToFetch: string = (req.query?.id as string) ?? "";
+    const participantID: string = (req.query?.participantID as string) ?? "";
 
     if (!ObjectId.isValid(idExpToFetch)) {
-        return res.status(404).json({message: "Experiment unknown."});
+        return res.status(404).json({ message: "Experiment unknown." });
     }
 
     // fetch the experiment
-    let experiment: Experiment  = await collections.experiments?.findOne(
-        {_id: new ObjectId(idExpToFetch)}
-    ) as Experiment;
+    const experiment: Experiment = (await collections.experiments?.findOne({
+        _id: new ObjectId(idExpToFetch),
+    })) as Experiment;
 
     // return the experiment's data
     const token = sign(
@@ -41,7 +40,9 @@ const getOneExperiment = async (req: Request, res: Response) => {
 
     //return null if the study is not active
     if (experiment?.status != "active") {
-        return res.status(401).json({message: "This experiment is not active."});
+        return res
+            .status(401)
+            .json({ message: "This experiment is not active." });
     }
 
     return res.status(200).json({

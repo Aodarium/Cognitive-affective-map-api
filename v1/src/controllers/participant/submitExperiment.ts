@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import Experiment from "../../models/experiment";
-import Participant from "../../models/participant";
-import { ObjectId } from 'bson';
+import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import Daughter from "../../models/daughter";
 
@@ -14,13 +12,16 @@ import Daughter from "../../models/daughter";
 
 const submitExperiment = async (req: Request, res: Response) => {
     //get the participant's token
-    const cam: string = req.body?.cam as string ?? "";
-    const token: string = req?.body?.jwt as string ?? "";
-    const idMother: string = req.body?.decoded?.motherID as string ?? "";
-    const participantID: string = req.body?.decoded?.participantID as string ?? "";
+    const cam: string = (req.body?.cam as string) ?? "";
+    const token: string = (req?.body?.jwt as string) ?? "";
+    const idMother: string = (req.body?.decoded?.motherID as string) ?? "";
+    const participantID: string =
+        (req.body?.decoded?.participantID as string) ?? "";
 
     if (!cam || !idMother || !participantID || !token) {
-        return res.status(404).json({ message: "Please submit a correct input." });
+        return res
+            .status(404)
+            .json({ message: "Please submit a correct input." });
     }
 
     // check the validity of the id
@@ -38,15 +39,15 @@ const submitExperiment = async (req: Request, res: Response) => {
     }
 
     //Checks if mother exist and breaks if not
-    const experimentMother = collections.experiments?.findOne(
-        { _id: new ObjectId(idMother) }
-    );
+    const experimentMother = collections.experiments?.findOne({
+        _id: new ObjectId(idMother),
+    });
     if (!experimentMother) {
         return res.status(404).json({ message: "The study cannot be found." });
     }
 
     //Insert the daughter's data into the mother's experiment
-    const daughter: any = {
+    const daughter: Daughter = {
         participantID: participantID,
         jwt: token,
         creationDate: new Date(),
@@ -55,8 +56,8 @@ const submitExperiment = async (req: Request, res: Response) => {
 
     collections.experiments?.updateOne(
         { _id: new ObjectId(idMother) },
-        { "$push": { daughters: daughter } }
-    )
+        { $push: { daughters: daughter as any } }
+    );
 
     const participant = {
         participantID: participantID,

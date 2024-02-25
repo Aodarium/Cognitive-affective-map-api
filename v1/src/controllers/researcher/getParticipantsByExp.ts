@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ObjectId } from 'bson';
+import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import Daughter from "../../models/daughter";
 
@@ -10,21 +10,19 @@ import Daughter from "../../models/daughter";
  * @returns {Array} Array with participants' data.
  */
 
-
 const getParticipantsByExp = async (req: Request, res: Response) => {
-
     const decoded = req.body?.decoded;
     const userId = new ObjectId(decoded.userId);
 
-    const motherID: string = req.query?.id as string || '';
+    const motherID: string = (req.query?.id as string) || "";
 
     if (!ObjectId.isValid(motherID)) {
         res.json({ participants: ["Invalide mother id"] });
         return;
     }
 
-    let daughters = (await collections.experiments?.findOne(
-        { _id: new ObjectId(motherID), researcherID: new ObjectId(userId) },
+    const daughters = (await collections.experiments?.findOne(
+        { _id: new ObjectId(motherID), researcherID: new ObjectId(userId) }
         //{ projection: { "_id": 0, "name": 1, "daughters": 1 } }
     )) as unknown as Daughter;
 

@@ -1,9 +1,15 @@
 import { ObjectId } from "mongodb";
 
-export default interface Researcher {
-    _id?: ObjectId,
+export enum Role {
+    student = "student",
+    guest = "guest",
+    researcher = "researcher",
+    admin = "admin",
+}
+export interface Researcher {
+    _id?: ObjectId;
     email: string;
     password: string;
-    role: string;
+    role: Role;
     paid: boolean;
-};
+}

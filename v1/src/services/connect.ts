@@ -1,17 +1,16 @@
 import * as mongoDB from "mongodb";
-import endpoint from '../../endpoints.config';
+import endpoint from "../../endpoints.config";
 import Experiment from "../models/experiment";
 import Participant from "../models/participant";
-import Researcher from "../models/researcher";
+import { Researcher } from "../models/researcher";
 
 export const collections: {
-    participants?: mongoDB.Collection<Participant>,
-    experiments?: mongoDB.Collection<Experiment>,
-    researchers?: mongoDB.Collection<Researcher>
+    participants?: mongoDB.Collection<Participant>;
+    experiments?: mongoDB.Collection<Experiment>;
+    researchers?: mongoDB.Collection<Researcher>;
 } = {};
 
 export async function connectToDatabase() {
-
     // Create a new MongoDB client with the connection string from .env
     const client = new mongoDB.MongoClient(endpoint.DB_LINK);
 
@@ -30,7 +29,5 @@ export async function connectToDatabase() {
     const participantCollection = db.collection<Participant>("participants");
     collections.participants = participantCollection;
 
-    console.log(
-        `Successfully connected to database: ${db.databaseName}`,
-    );
+    console.log(`Successfully connected to database: ${db.databaseName}`);
 }

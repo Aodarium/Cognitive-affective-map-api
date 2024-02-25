@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Researcher from "../../models/researcher";
+import { Researcher, Role } from "../../models/researcher";
 import { collections } from "../../services/connect";
 
 /**
@@ -11,22 +11,19 @@ import { collections } from "../../services/connect";
 
 const changeUserRoleStatus = async (req: Request, res: Response) => {
     try {
-        const newRole: string = req?.body?.status as string ?? "researcher";
-        const emailUser: string = req.body?.email as string ?? '';
+        const newRole: Role = (req?.body?.status as Role) ?? "researcher";
+        const emailUser: string = (req.body?.email as string) ?? "";
 
-        if (
-            ["assistant", "researcher", "admin"].indexOf(newRole) === -1
-        ) {
+        if (["assistant", "researcher", "admin"].indexOf(newRole) === -1) {
             res.status(409).json({
-                message:
-                    "Chose a valid status from: assistant or researcher.",
+                message: "Chose a valid status from: assistant or researcher.",
             });
             return;
         }
 
-        const researcher = await collections.researchers?.findOne(
-            { email: emailUser }
-        ) as Researcher;
+        const researcher = (await collections.researchers?.findOne({
+            email: emailUser,
+        })) as Researcher;
 
         if (!researcher) {
             res.status(409).json({ message: "Invalide user account" });
@@ -37,12 +34,13 @@ const changeUserRoleStatus = async (req: Request, res: Response) => {
             {
                 email: emailUser,
             },
-            { "$set": { "role": newRole } }
+            { $set: { role: newRole } }
         );
 
-        res.status(201).json({ message: `Status changed - ${emailUser}'s role status is now ${newRole}` });
-    }
-    catch (err) {
+        res.status(201).json({
+            message: `Status changed - ${emailUser}'s role status is now ${newRole}`,
+        });
+    } catch (err) {
         res.status(401).json({ message: err });
     }
     return;

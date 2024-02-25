@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Experiment from "../../models/experiment";
-import Researcher from "../../models/researcher";
-import { ObjectId } from 'bson';
+import { Researcher } from "../../models/researcher";
+import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 
 /**
@@ -11,13 +11,13 @@ import { collections } from "../../services/connect";
  */
 
 const changeExperimentStatus = async (req: Request, res: Response) => {
-
-    const decoded: any = req.body?.decoded ?? '';
-    const newStatus: string = req?.body?.status as string ?? "inactive";
-    const idExperiment: string = req.body?.id as string ?? '';
+    const decoded: any = req.body?.decoded ?? "";
+    const newStatus: string = (req?.body?.status as string) ?? "inactive";
+    const idExperiment: string = (req.body?.id as string) ?? "";
 
     if (
-        ["inactive", "active", "completed", "archived"].indexOf(newStatus) === -1
+        ["inactive", "active", "completed", "archived"].indexOf(newStatus) ===
+        -1
     ) {
         res.status(409).json({
             message:
@@ -33,9 +33,9 @@ const changeExperimentStatus = async (req: Request, res: Response) => {
     }
 
     //Check if exists and break if not
-    const experiment = await collections.experiments?.findOne(
-        { _id: new ObjectId(String(idExperiment)) }
-    ) as Experiment;
+    const experiment = (await collections.experiments?.findOne({
+        _id: new ObjectId(String(idExperiment)),
+    })) as Experiment;
 
     if (!experiment) {
         res.status(409).json({ message: "Invalide experiment" });
@@ -43,9 +43,9 @@ const changeExperimentStatus = async (req: Request, res: Response) => {
     }
 
     //update the status of other experiments based on the user's paid value
-    const researcher = await collections.researchers?.findOne(
-        { _id: new ObjectId(decoded.userId) }
-    ) as Researcher;
+    const researcher = (await collections.researchers?.findOne({
+        _id: new ObjectId(decoded.userId),
+    })) as Researcher;
 
     if (!researcher) {
         res.status(409).json({ message: "Invalide user account" });
@@ -59,16 +59,18 @@ const changeExperimentStatus = async (req: Request, res: Response) => {
                 researcherID: new ObjectId(decoded.userId),
                 status: "active",
             },
-            { "$set": { status: "inactive" } }
+            { $set: { status: "inactive" } }
         );
     }
 
     //update the status
-    const resultId = await collections.experiments?.updateOne(
+    await collections.experiments?.updateOne(
         { _id: new ObjectId(idExperiment) },
-        { "$set": { status: newStatus } }
+        { $set: { status: newStatus } }
     );
-    res.status(201).json({ message: `Status changed - ${idExperiment} is now ${newStatus}` });
+    res.status(201).json({
+        message: `Status changed - ${idExperiment} is now ${newStatus}`,
+    });
     return;
 };
 

@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import endpoint from '../../endpoints.config';
+import endpoint from "../../endpoints.config";
 
 function isAdmin(req: Request, res: Response, next: NextFunction) {
     verify(req.body?.jwt, endpoint.KEY_JWT, async (err: any, decoded: any) => {
@@ -15,5 +15,5 @@ function isAdmin(req: Request, res: Response, next: NextFunction) {
             res.status(401).json({ message: "You are not authenticated." });
         }
     });
-};
+}
 export default isAdmin;
