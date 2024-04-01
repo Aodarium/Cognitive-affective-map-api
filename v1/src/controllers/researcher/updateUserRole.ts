@@ -34,7 +34,7 @@ const changeUserRoleStatus = async (
     })) as Researcher;
 
     if (!researcher) {
-        res.status(403).json({ message: "Invalide user account" });
+        res.status(404).json({ message: "Invalide user account" });
         return;
     }
 
@@ -46,7 +46,7 @@ const changeUserRoleStatus = async (
     );
 
     res.status(201).json({
-        message: `Status changed - ${emailUser}'s role status is now ${newRole}`,
+        message: `Role changed - ${emailUser}'s role status is now ${newRole}`,
     });
 
     return;

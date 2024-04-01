@@ -44,7 +44,7 @@ const addExperiment = async (req: Request, res: Response) => {
                       message: `Experiment added successfully ${result.insertedId}`,
                   })
             : res
-                  .status(500)
+                  .status(400)
                   .send({ message: "Failed to create a new experiment." });
     } catch (err) {
         res.status(500).json({ message: err });

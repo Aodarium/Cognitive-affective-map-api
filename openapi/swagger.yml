@@ -10,23 +10,45 @@ servers:
 paths:
     /researcher/login:
         post:
-            summary: Returns a list of users.
-            description: Optional extended description in CommonMark or HTML.
+            summary: Log in a user.
+            description: Endpoint in charge of logging in.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                password:
+                                    type: string
+                                    format: password
             responses:
                 "200": # status code
-                    description: A JSON array of user names
+                    description: The account is authenticated
                     content:
                         application/json:
                             schema:
-                                type: array
-                                items:
-                                    type: string
+                                type: object
+                                properties:
+                                    jwt:
+                                        type: string
+                                        description: Token used to identify
+                "401":
+                    description: Mising information.
+                "404":
+                    description: Access denied, user not found
+                "500":
+                    description: Error while computing information.
     /researcher/signup:
         post:
+            security:
+                - ApiKeyAuth: []
             summary: Register an account.
             description: Endpoint in charge of registering a new account. Only administrators can add new accounts.
             requestBody:
-                description: Optional description in *Markdown*
                 required: true
                 content:
                     application/json:
@@ -41,10 +63,7 @@ paths:
                                     format: password
                                 role:
                                     type: string
-                                    enum: [ACTIVE, INACTIVE, ARCHIVED]
-                                jwt:
-                                    type: string
-                                    description: token given while loging in
+                                    enum: [GUEST, STUDENT, RESEARCHER]
             responses:
                 "201": # status code
                     description: A new account is created
@@ -65,92 +84,174 @@ paths:
 
     /researcher/updateRole:
         put:
-            summary: Returns a list of users.
-            description: Optional extended description in CommonMark or HTML.
+            security:
+                - ApiKeyAuth: []
+            summary: Update role of a given account
+            description: Endpoint in charge of updating the role of a user. Only administrators can add new accounts.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                role:
+                                    type: string
+                                    enum: [GUEST, STUDENT, RESEARCHER]
             responses:
-                "200": # status code
-                    description: A JSON array of user names
+                "201": # status code
+                    description: The account's role is updated
                     content:
                         application/json:
                             schema:
-                                type: array
-                                items:
-                                    type: string
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: Role changed
+                "403":
+                    description: Mising information or incorrect role.
+                "404":
+                    description: Account not found.
+                "500":
+                    description: Error while computing information.
     /researcher/updatePaid:
         put:
-            summary: Returns a list of users.
+            security:
+                - ApiKeyAuth: []
+            summary: Update the status (paid) of the user
             description: Optional extended description in CommonMark or HTML.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
             responses:
                 "200": # status code
                     description: A JSON array of user names
                     content:
                         application/json:
                             schema:
-                                type: array
-                                items:
-                                    type: string
+                                type: string
+
     /researcher/addExperiment:
         post:
-            summary: Returns a list of users.
+            security:
+                - ApiKeyAuth: []
+            summary: Add an experiment
             description: Optional extended description in CommonMark or HTML.
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                camFileRaw:
+                                    type: object
+                                    description: CAM with the configuration and the template
+                                name:
+                                    type: string
+                                    description: Name of the CAM to create
+                                link:
+                                    type: string
+                                    description: Link to redirect user to once finished drawing
+
+            responses:
+                "201": # status code
+                    description: Experiment added successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: Experiment added successfully
+                "400":
+                    description: Fail to create the experiment
+                
+                "403":
+                    description: Mising information in the request
+                
+
+    /researcher/getExperimentByAuthor/{id}:
+        get:
+            security:
+                - ApiKeyAuth: []
+            summary: Returns a list experiments from one author
+            description: Optional extended description in CommonMark or HTML.
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                    type: string
+
             responses:
                 "200": # status code
-                    description: A JSON array of user names
+                    description: A JSON array of the experiment
                     content:
                         application/json:
                             schema:
                                 type: array
                                 items:
-                                    type: string
-    /researcher/getExperimentByAuthor:
-        post:
-            summary: Returns a list of users.
+                                    type: object
+    
+    /researcher/getExperimentById/{id}:
+        get:
+            security:
+                - ApiKeyAuth: []
+            summary: Get the data about on given experiment
             description: Optional extended description in CommonMark or HTML.
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                    type: string
             responses:
                 "200": # status code
-                    description: A JSON array of user names
+                    description: A JSON with the requested experiment
                     content:
                         application/json:
                             schema:
-                                type: array
-                                items:
-                                    type: string
-    /researcher/getExperimentById:
-        post:
-            summary: Returns a list of users.
-            description: Optional extended description in CommonMark or HTML.
-            responses:
-                "200": # status code
-                    description: A JSON array of user names
-                    content:
-                        application/json:
-                            schema:
-                                type: array
+                                type: object
                                 items:
                                     type: string
     /researcher/changeExperimentStatus:
         put:
-            summary: Returns a list of users.
+            security:
+                - ApiKeyAuth: []
+            summary: Change the status of one experiment.
             description: Optional extended description in CommonMark or HTML.
             responses:
-                "200": # status code
-                    description: A JSON array of user names
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    type: string
+                "201": # status code
+                    description: Status changed
+
     /researcher/deleteExperiment:
         delete:
-            summary: Returns a list of users.
-            description: Optional extended description in CommonMark or HTML.
+            security:
+                - ApiKeyAuth: []
+            summary: Delete a given experiment
             responses:
-                "200": # status code
-                    description: A JSON array of user names
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    type: string
+                "201": # status code
+                    description: Experiment deleted
+
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: CAM-API-KEY
