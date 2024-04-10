@@ -6,6 +6,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import fs from "fs";
 import path from "path";
+import mongoSanitize from "express-mongo-sanitize";
 
 const app: Express = express();
 
@@ -30,6 +31,7 @@ app.use(
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(mongoSanitize());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
     res.header("Access-Control-Allow-Origin", "*");
