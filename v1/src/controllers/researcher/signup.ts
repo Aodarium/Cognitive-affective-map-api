@@ -3,6 +3,7 @@ import * as bcrypt from "bcrypt";
 import { Researcher, Role } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
 import { collections } from "../../services/connect";
+import logger from "../../services/logger";
 
 interface NewUserInputModel {
     email: string;
@@ -23,10 +24,12 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
     const role: Role = req.body.role;
 
     if (!email || !password || !role) {
+        logger.warn("Mising information");
         res.status(401).json({ message: "Mising information" });
         return;
     }
     if (!Object.values(Role).includes(role)) {
+        logger.warn("Incorrect role: ", role);
         res.status(401).json({ message: "Incorrect role" });
         return;
     }
@@ -35,12 +38,14 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
     });
 
     if (existingResearcher) {
+        logger.warn("Email taken");
         res.status(409).json({ message: "Email taken" });
         return;
     }
     const hash = await bcrypt.hash(password, 10);
 
     if (!hash) {
+        logger.error("Error while comparing pwd");
         res.status(500).json({ message: "Error while comparing pwd" });
         return;
     }
@@ -60,6 +65,7 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
             message: `researcher created with id ${insertresult?.insertedId}`,
         });
     } catch (err) {
+        logger.error("Error:", err);
         res.status(500).json({ message: err });
     }
     return;

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import Daughter from "../../models/daughter";
+import logger from "../../services/logger";
 
 /**
  * Get all participants' data linked to one experiment you owned.
@@ -17,6 +18,7 @@ const getParticipantsByExp = async (req: Request, res: Response) => {
     const motherID: string = (req.query?.id as string) || "";
 
     if (!ObjectId.isValid(motherID)) {
+        logger.warn("Invalide mother id", motherID);
         res.json({ participants: ["Invalide mother id"] });
         return;
     }

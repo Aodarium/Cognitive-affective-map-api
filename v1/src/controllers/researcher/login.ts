@@ -5,6 +5,7 @@ import endpoint from "../../../endpoints.config";
 import { collections } from "../../services/connect";
 import { Researcher } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
+import logger from "../../services/logger";
 
 interface UserInputModel {
     email: string;
@@ -16,6 +17,7 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
     const password: string = req.body.password as string;
 
     if (!email || !password) {
+        logger.warn("Missing information while loging");
         res.status(401).json({ message: "Missing information" });
         return;
     }
@@ -25,6 +27,7 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
     })) as unknown as Researcher;
 
     if (!user) {
+        logger.warn("Invalide credentials");
         res.status(403).json({ message: "Invalide credentials" });
         return;
     }
@@ -33,6 +36,7 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
 
     bcrypt.compare(password, pwdUser, (err: any, result: any) => {
         if (err) {
+            logger.warn("Bad credentials");
             res.status(401).json({
                 message: "Authentification fail",
             });
@@ -50,12 +54,13 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
                     expiresIn: "6h",
                 }
             );
-
+            logger.info("User logged in");
             res.status(201).json({
                 token,
             });
             return;
         }
+        logger.warn("Bad credentials");
         res.status(403).json({ message: "Invalide credentials" });
         return;
     });

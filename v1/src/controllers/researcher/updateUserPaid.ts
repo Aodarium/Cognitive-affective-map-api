@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Researcher } from "../../models/researcher";
 import { collections } from "../../services/connect";
+import logger from "../../services/logger";
 
 /**
  * Change the status of one User.
@@ -20,6 +21,7 @@ const changeUserPaidStatus = async (req: Request, res: Response) => {
         })) as Researcher;
 
         if (!researcher) {
+            logger.warn("Invalide user account");
             res.status(409).json({ message: "Invalide user account" });
             return;
         }
@@ -34,6 +36,7 @@ const changeUserPaidStatus = async (req: Request, res: Response) => {
             message: `Status changed - ${emailUser}'s paid status is now ${newStatus}`,
         });
     } catch (err) {
+        logger.error("Status error: ", err);
         res.status(401).json({ message: err });
     }
     return;

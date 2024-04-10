@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Researcher, Role } from "../../models/researcher";
 import { collections } from "../../services/connect";
 import { Wrapper } from "../../models/generals";
+import logger from "../../services/logger";
 
 interface UserRoleInput {
     role: string;
@@ -22,6 +23,7 @@ const changeUserRoleStatus = async (
     const emailUser = req.body.email;
 
     if (!Object.values(Role).includes(newRole)) {
+        logger.warn("Invalide status");
         res.status(403).json({
             message:
                 "Choose a valid status from: student, guest, or researcher.",
@@ -34,6 +36,7 @@ const changeUserRoleStatus = async (
     })) as Researcher;
 
     if (!researcher) {
+        logger.warn("Invalide user account");
         res.status(404).json({ message: "Invalide user account" });
         return;
     }

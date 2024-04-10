@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Experiment } from "../../models/experiment";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
+import logger from "../../services/logger";
 
 /**
  * Delete one experiment you owned.
@@ -14,6 +15,7 @@ const deleteExperiment = async (req: Request, res: Response) => {
     const id: string = (req.body?.id as string) ?? "";
 
     if (!ObjectId.isValid(id) || !ObjectId.isValid(userId)) {
+        logger.warn("Invalid id.");
         res.status(409).json({ message: "Invalid id." });
         return;
     }
@@ -25,6 +27,7 @@ const deleteExperiment = async (req: Request, res: Response) => {
     })) as Experiment;
 
     if (!experiment) {
+        logger.warn("This experiment does not exist.");
         res.status(404).json({ message: "This experiment does not exist." });
         return;
     }

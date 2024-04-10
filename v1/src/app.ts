@@ -8,10 +8,6 @@ import fs from "fs";
 import path from "path";
 
 const app: Express = express();
-const accessLogStream = fs.createWriteStream(
-    path.join(__dirname, "access.log"),
-    { flags: "a" }
-);
 
 connectToDatabase();
 
@@ -21,10 +17,16 @@ const limiter = RateLimit({
     max: 20,
 });
 
-//  add documentation to the api
-
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    { flags: "a" }
+);
 app.use(limiter);
-app.use(morgan("common", { stream: accessLogStream }));
+app.use(
+    morgan(":date[iso] :remote-addr :method :url :status", {
+        stream: accessLogStream,
+    })
+);
 app.use(helmet());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -36,7 +38,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
         "origin, X-Requested-With,Content-Type,Accept, Authorization"
     );
     if (req.method === "OPTIONS") {
-        res.header("Access-Control-Allow-Methods", "GET POST");
+        res.header("Access-Control-Allow-Methods", "GET POST PUT DELETE");
         return res.status(200).json({});
     }
     next();

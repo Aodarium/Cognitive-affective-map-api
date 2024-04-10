@@ -21,8 +21,8 @@ router.put("/updateRole", isAdmin, updateUserRole);
 router.put("/updatePaid", isAdmin, updateUserPaid);
 
 router.post("/addExperiment", isAuth, addExperiment);
-router.post("/getExperimentByAuthor", isAuth, getExperimentByAuthor);
-router.post("/getExperimentById", isAuth, getParticipantsByExp);
+router.get("/getExperimentByAuthor", isAuth, getExperimentByAuthor);
+router.get("/getExperimentById", isAuth, getParticipantsByExp);
 router.put("/changeExperimentStatus", isAuth, changeExperimentStatus);
 router.delete("/deleteExperiment", isAuth, deleteExperiment);
 

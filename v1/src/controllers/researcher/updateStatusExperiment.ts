@@ -4,6 +4,7 @@ import { Researcher } from "../../models/researcher";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import { Wrapper } from "../../models/generals";
+import logger from "../../services/logger";
 
 interface ExpNewInputModel {
     decoded: any;
@@ -26,6 +27,7 @@ const changeExperimentStatus = async (
     const idExperiment: string = req.body.id;
 
     if (!Object.values(Status).includes(newStatus)) {
+        logger.warn("Invalide status");
         res.status(409).json({
             message: "Chose a valid status from: inactive, active, archived",
         });
@@ -34,6 +36,7 @@ const changeExperimentStatus = async (
 
     // check the validity of the id
     if (!ObjectId.isValid(idExperiment)) {
+        logger.warn("Invalide id");
         res.status(409).json({ message: "Invalide id" });
         return;
     }
@@ -44,6 +47,7 @@ const changeExperimentStatus = async (
     })) as Experiment;
 
     if (!experiment) {
+        logger.warn("Invalide id");
         res.status(409).json({ message: "Invalide experiment" });
         return;
     }
@@ -54,6 +58,7 @@ const changeExperimentStatus = async (
     })) as Researcher;
 
     if (!researcher) {
+        logger.warn("Invalide user account");
         res.status(409).json({ message: "Invalide user account" });
         return;
     }

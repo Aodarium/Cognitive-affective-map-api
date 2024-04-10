@@ -8,7 +8,7 @@ servers:
       description: Main (test) server
 
 paths:
-    /researcher/login:
+    /researchers/login:
         post:
             summary: Log in a user.
             description: Endpoint in charge of logging in.
@@ -42,7 +42,7 @@ paths:
                     description: Access denied, user not found
                 "500":
                     description: Error while computing information.
-    /researcher/signup:
+    /researchers/signup:
         post:
             security:
                 - ApiKeyAuth: []
@@ -82,7 +82,7 @@ paths:
                 "500":
                     description: Error while computing information.
 
-    /researcher/updateRole:
+    /researchers/updateRole:
         put:
             security:
                 - ApiKeyAuth: []
@@ -118,7 +118,7 @@ paths:
                     description: Account not found.
                 "500":
                     description: Error while computing information.
-    /researcher/updatePaid:
+    /researchers/updatePaid:
         put:
             security:
                 - ApiKeyAuth: []
@@ -142,7 +142,7 @@ paths:
                             schema:
                                 type: string
 
-    /researcher/addExperiment:
+    /researchers/addExperiment:
         post:
             security:
                 - ApiKeyAuth: []
@@ -178,12 +178,11 @@ paths:
                                         description: Experiment added successfully
                 "400":
                     description: Fail to create the experiment
-                
+
                 "403":
                     description: Mising information in the request
-                
 
-    /researcher/getExperimentByAuthor/{id}:
+    /researchers/getExperimentByAuthor/{id}:
         get:
             security:
                 - ApiKeyAuth: []
@@ -195,7 +194,7 @@ paths:
                   description: User ID
                   required: true
                   schema:
-                    type: string
+                      type: string
 
             responses:
                 "200": # status code
@@ -206,8 +205,8 @@ paths:
                                 type: array
                                 items:
                                     type: object
-    
-    /researcher/getExperimentById/{id}:
+
+    /researchers/getExperimentById/{id}:
         get:
             security:
                 - ApiKeyAuth: []
@@ -219,7 +218,7 @@ paths:
                   description: User ID
                   required: true
                   schema:
-                    type: string
+                      type: string
             responses:
                 "200": # status code
                     description: A JSON with the requested experiment
@@ -229,7 +228,7 @@ paths:
                                 type: object
                                 items:
                                     type: string
-    /researcher/changeExperimentStatus:
+    /researchers/changeExperimentStatus:
         put:
             security:
                 - ApiKeyAuth: []
@@ -239,7 +238,7 @@ paths:
                 "201": # status code
                     description: Status changed
 
-    /researcher/deleteExperiment:
+    /researchers/deleteExperiment:
         delete:
             security:
                 - ApiKeyAuth: []
@@ -248,10 +247,9 @@ paths:
                 "201": # status code
                     description: Experiment deleted
 
-
 components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: CAM-API-KEY
+    securitySchemes:
+        ApiKeyAuth:
+            type: apiKey
+            in: header
+            name: CAM-API-KEY

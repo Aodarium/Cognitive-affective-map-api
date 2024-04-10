@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { collections } from "../../services/connect";
 import { ObjectId } from "bson";
 import { Experiment, Status } from "../../models/experiment";
+import logger from "../../services/logger";
 
 /**
  * Add an experiment.
@@ -20,6 +21,7 @@ const addExperiment = async (req: Request, res: Response) => {
     const configcam = camFile?.config ?? "";
 
     if (!name || !cam || !configcam || !link) {
+        logger.warn("Invalide content");
         res.status(401).json({ message: "Invalid content" });
         return;
     }
@@ -37,16 +39,18 @@ const addExperiment = async (req: Request, res: Response) => {
         };
 
         const result = await collections.experiments?.insertOne(experiment);
-        result
-            ? res
-                  .status(201)
-                  .send({
-                      message: `Experiment added successfully ${result.insertedId}`,
-                  })
-            : res
-                  .status(400)
-                  .send({ message: "Failed to create a new experiment." });
+        if (result) {
+            res.status(201).send({
+                message: `Experiment added successfully ${result.insertedId}`,
+            });
+        } else {
+            logger.warn("Failed to create a new experiment.");
+            res.status(400).send({
+                message: "Failed to create a new experiment.",
+            });
+        }
     } catch (err) {
+        logger.error("Failed to create a new experiment: ", err);
         res.status(500).json({ message: err });
     }
     return;
