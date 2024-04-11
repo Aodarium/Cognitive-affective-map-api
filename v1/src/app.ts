@@ -7,6 +7,8 @@ import helmet from "helmet";
 import fs from "fs";
 import path from "path";
 import mongoSanitize from "express-mongo-sanitize";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app: Express = express();
 
@@ -23,6 +25,7 @@ const accessLogStream = fs.createWriteStream(
     { flags: "a" }
 );
 app.use(limiter);
+app.use(cookieParser())
 app.use(
     morgan(":date[iso] :remote-addr :method :url :status", {
         stream: accessLogStream,
@@ -33,16 +36,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(mongoSanitize());
 
+app.use(cors({
+    origin: "http://localhost:3000"
+}))
 app.use((req: Request, res: Response, next: NextFunction) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "origin, X-Requested-With,Content-Type,Accept, Authorization"
-    );
-    if (req.method === "OPTIONS") {
-        res.header("Access-Control-Allow-Methods", "GET POST PUT DELETE");
-        return res.status(200).json({});
-    }
+    res.header("Access-Control-Allow-Credentials", "true");
+    //res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    //res.header("Access-Control-Allow-Headers", "http://localhost:3000");
     next();
 });
 

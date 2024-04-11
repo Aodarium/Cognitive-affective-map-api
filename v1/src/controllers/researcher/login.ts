@@ -55,7 +55,7 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
                 }
             );
             logger.info("User logged in");
-            res.status(201).json({
+            res.status(200).json({
                 token,
             });
             return;
