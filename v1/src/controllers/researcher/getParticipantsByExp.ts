@@ -19,7 +19,10 @@ const getParticipantsByExp = async (req: Request, res: Response) => {
 
     if (!ObjectId.isValid(motherID)) {
         logger.warn("Invalide mother id", motherID);
-        res.json({ participants: ["Invalide mother id"] });
+        res.status(404).json({
+            message:
+                "The experiment id cannot be found in the set of experiments.",
+        });
         return;
     }
 
