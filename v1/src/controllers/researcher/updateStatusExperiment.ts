@@ -23,7 +23,7 @@ const changeExperimentStatus = async (
     res: Response
 ) => {
     const userId: string = req.body.decoded.userId;
-    const newStatus: Status = req.body.status;
+    const newStatus: Status = req.body.status.toUpperCase() as Status;
     const idExperiment: string = req.body.id;
 
     if (!Object.values(Status).includes(newStatus)) {

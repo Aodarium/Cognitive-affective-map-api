@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import Daughter from "../../models/daughter";
+import { Status } from "../../models/experiment";
 
 /**
  * Add one experiment by participant.
@@ -39,7 +40,7 @@ const submitExperiment = async (req: Request, res: Response) => {
     }
 
     //Checks if mother exist and breaks if not
-    const experimentMother = collections.experiments?.findOne({
+    const experimentMother = await collections.experiments?.findOne({
         _id: new ObjectId(idMother),
     });
     if (!experimentMother) {
@@ -54,10 +55,17 @@ const submitExperiment = async (req: Request, res: Response) => {
         cam: JSON.stringify(cam),
     };
 
-    collections.experiments?.updateOne(
-        { _id: new ObjectId(idMother) },
-        { $push: { daughters: daughter as any } }
-    );
+    let status = experimentMother.status;
+    if (
+        experimentMother.numberOfParticipantsWanted >=
+        experimentMother.daughters.length + 1
+    ) {
+        status = Status.COMPLETE;
+    }
+    collections.experiments?.updateOne({ _id: new ObjectId(idMother) }, [
+        { $push: { daughters: daughter as any } },
+        { $set: { status: status as string } },
+    ]);
 
     const participant = {
         participantID: participantID,

@@ -5,6 +5,7 @@ export enum Status {
     ACTIVE = "ACTIVE",
     INACTIVE = "INACTIVE",
     ARCHIVED = "ARCHIVED",
+    COMPLETE = "COMPLETE",
 }
 export interface Experiment {
     name: string;
@@ -15,4 +16,5 @@ export interface Experiment {
     link: string;
     status: Status;
     daughters: Daughter[];
+    numberOfParticipantsWanted: number;
 }

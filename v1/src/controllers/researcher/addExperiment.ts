@@ -15,6 +15,8 @@ const addExperiment = async (req: Request, res: Response) => {
     const decoded = req.body?.decoded;
     const name: string = (req.body?.name as string) ?? "";
     const link: string = (req.body?.link as string) ?? "";
+    const numberOfParticipantsWanted: number =
+        (req.body?.numberOfParticipantsWanted as number) ?? 50;
     const camFileRaw: string = (req.body?.cam as string) ?? "";
     const camFile = JSON.parse(camFileRaw);
     const cam = camFile?.CAM ?? "";
@@ -36,6 +38,7 @@ const addExperiment = async (req: Request, res: Response) => {
             link: link,
             status: Status.INACTIVE,
             daughters: [],
+            numberOfParticipantsWanted: numberOfParticipantsWanted,
         };
 
         const result = await collections.experiments?.insertOne(experiment);
