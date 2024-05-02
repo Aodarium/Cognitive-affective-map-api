@@ -3,6 +3,7 @@ import { collections } from "../../services/connect";
 import { ObjectId } from "bson";
 import { Experiment, Status } from "../../models/experiment";
 import logger from "../../services/logger";
+import { isNameValid, isNumberValid, isUrlValid } from "../../services/utils";
 
 /**
  * Add an experiment.
@@ -13,18 +14,40 @@ import logger from "../../services/logger";
 
 const addExperiment = async (req: Request, res: Response) => {
     const decoded = req.body?.decoded;
-    const name: string = (req.body?.name as string) ?? "";
-    const link: string = (req.body?.link as string) ?? "";
-    const numberOfParticipantsWanted: number =
-        (req.body?.numberOfParticipantsWanted as number) ?? 50;
-    const camFileRaw: string = (req.body?.cam as string) ?? "";
-    const camFile = JSON.parse(camFileRaw);
+    const configuration: string = (req.body?.configuration as string) ?? "";
+    const camFile = JSON.parse(configuration);
     const cam = camFile?.CAM ?? "";
     const configcam = camFile?.config ?? "";
 
-    if (!name || !cam || !configcam || !link) {
-        logger.warn("Invalide content");
-        res.status(401).json({ message: "Invalid content" });
+    if (!cam || !configcam) {
+        logger.warn("The provided template is not valide");
+        res.status(400).json({
+            message: "The provided template is not valide",
+        });
+        return;
+    }
+
+    const link: string = (req.body?.link as string) ?? "";
+    if (!isUrlValid(link)) {
+        logger.warn("The provided link is not valide");
+        res.status(400).json({ message: "The provided link is not valide" });
+        return;
+    }
+
+    const name: string = (req.body?.name as string) ?? "";
+    if (!isNameValid(name)) {
+        logger.warn("The provided name is not valide");
+        res.status(400).json({ message: "The provided name is not valide" });
+        return;
+    }
+
+    const numberOfParticipantsWanted: number =
+        (req.body?.numberOfParticipantsWanted as number) ?? 50;
+    if (!isNumberValid(numberOfParticipantsWanted)) {
+        logger.warn("The provided numberOfParticipantsWanted is not valide");
+        res.status(400).json({
+            message: "The provided numberOfParticipantsWanted is not valide",
+        });
         return;
     }
 

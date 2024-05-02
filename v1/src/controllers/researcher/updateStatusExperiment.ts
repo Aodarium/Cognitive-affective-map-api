@@ -29,7 +29,7 @@ const changeExperimentStatus = async (
     if (!Object.values(Status).includes(newStatus)) {
         logger.warn("Invalide status");
         res.status(409).json({
-            message: "Chose a valid status from: inactive, active, archived",
+            message: "Choose a valid status from: inactive, active, archived",
         });
         return;
     }

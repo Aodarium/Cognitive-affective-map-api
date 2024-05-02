@@ -15,6 +15,7 @@ interface UserInputModel {
 const login = async (req: Wrapper<UserInputModel>, res: Response) => {
     const email: string = req.body.email as string;
     const password: string = req.body.password as string;
+    console.log(req.body);
 
     if (!email || !password) {
         logger.warn("Missing information while loging");
