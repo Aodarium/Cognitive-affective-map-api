@@ -14,18 +14,6 @@ import { isNameValid, isNumberValid, isUrlValid } from "../../services/utils";
 
 const addExperiment = async (req: Request, res: Response) => {
     const decoded = req.body?.decoded;
-    const configuration: string = (req.body?.configuration as string) ?? "";
-    const camFile = JSON.parse(configuration);
-    const cam = camFile?.CAM ?? "";
-    const configcam = camFile?.config ?? "";
-
-    if (!cam || !configcam) {
-        logger.warn("The provided template is not valide");
-        res.status(400).json({
-            message: "The provided template is not valide",
-        });
-        return;
-    }
 
     const link: string = (req.body?.link as string) ?? "";
     if (!isUrlValid(link)) {
@@ -50,6 +38,19 @@ const addExperiment = async (req: Request, res: Response) => {
         });
         return;
     }
+
+    const configuration: string = (req.body?.configuration as string) ?? "";
+    const camFile = JSON.parse(configuration);
+    const cam = camFile?.CAM ?? "";
+    const configcam = camFile?.config ?? "";
+
+    //if (!cam || !configcam) {
+    //    logger.warn("The provided template is not valide");
+    //    res.status(400).json({
+    //        message: "The provided template is not valide",
+    //    });
+    //    return;
+    //}
 
     try {
         const experiment: Experiment = {

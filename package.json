@@ -27,11 +27,13 @@
     },
     "main": "server.ts",
     "scripts": {
-        "dev": "nodemon server.ts",
+        "dev": "nodemon api/index.ts",
         "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
         "start": "node build/server.js",
         "lint": "eslint . --ext .ts",
-        "test": "jest"
+        "test": "jest",
+        "vercel-dev": "vercel dev",
+        "vercel": "vercel"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.23.3",
