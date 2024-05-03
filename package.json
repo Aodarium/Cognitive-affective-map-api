@@ -28,12 +28,15 @@
     "main": "server.ts",
     "scripts": {
         "dev": "nodemon api/index.ts",
-        "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
-        "start": "node build/server.js",
         "lint": "eslint . --ext .ts",
+        "start": "nodemon src/index.ts",
+        "build": "rimraf dist && tsc",
+        "ts.check": "tsc --project tsconfig.json",
+        "add-build": "git add dist",
         "test": "jest",
+        "deploy": "vercel deploy --prod",
         "vercel-dev": "vercel dev",
-        "vercel": "vercel"
+        "vercel": "vercel-build"
     },
     "devDependencies": {
         "@babel/preset-typescript": "^7.23.3",
@@ -43,5 +46,10 @@
         "eslint": "^8.57.0",
         "ts-jest": "^29.1.2",
         "typescript": "^5.3.3"
-    }
+    },
+    "pre-commit": [
+        "ts.check",
+        "build",
+        "add-build"
+    ]
 }
