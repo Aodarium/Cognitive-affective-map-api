@@ -53,6 +53,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 /** Routes */
 app.use("/participants", participantsRoutes);
 app.use("/researchers", researchersRoutes);
+app.get("/", (req, res) => {
+    res.status(201).send({
+        message: `Application is Alive`,
+    });
+});
 
 /** Error handling */
 app.use((_req: Request, res: Response) => {
