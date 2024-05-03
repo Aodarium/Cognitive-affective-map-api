@@ -29,7 +29,8 @@
     "scripts": {
         "dev": "nodemon api/index.ts",
         "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
-        "start": "node build/server.js",
+        "build-loc": "tsc",
+        "start": "node api/server.js",
         "lint": "eslint . --ext .ts",
         "test": "echo \"Error: no test specified\" && exit 1",
         "vercel-dev": "vercel dev",
