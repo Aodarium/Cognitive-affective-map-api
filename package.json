@@ -28,7 +28,7 @@
     "main": "server.ts",
     "scripts": {
         "dev": "nodemon api/index.ts",
-        "vercel-build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
+        "vercel-build": "echo hello",
         "build": "rm -rf build/ && ./node_modules/typescript/bin/tsc",
         "build-loc": "tsc",
         "start": "node api/server.js",
