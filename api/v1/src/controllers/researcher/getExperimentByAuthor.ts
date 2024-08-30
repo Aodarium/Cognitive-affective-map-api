@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { Experiment } from "../../models/experiment";
 import { ObjectId } from "bson";
-import { collections } from "../../services/connect";
+import { getExperimentsByUser } from "../../services/dbFuncs";
+import logger from "../../services/logger";
 
 /**
  * Get all experiments by author.
@@ -12,13 +12,12 @@ import { collections } from "../../services/connect";
 const getExperimentByAuthor = async (req: Request, res: Response) => {
     const userId: string = (req.body?.decoded?.userId as string) ?? "";
 
-    const experiments = (await collections.experiments
-        ?.aggregate([
-            { $match: { researcherID: new ObjectId(userId) } },
-            { $set: { numberCams: { $size: "$daughters" } } },
-            { $project: { daughters: 0, researcherID: 0 } },
-        ])
-        .toArray()) as Experiment[];
+    if (!ObjectId.isValid(userId)) {
+        logger.warn("Invalide userId", userId);
+        res.status(404).json({ message: "The userId cannot be found." });
+        return;
+    }
+    const experiments = await getExperimentsByUser(userId);
 
     res.status(200).json({ experiments });
     return;

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { collections } from "../../services/connect";
 import { ObjectId } from "bson";
 import { Experiment, Status } from "../../models/experiment";
 import logger from "../../services/logger";
 import { isNameValid, isNumberValid, isUrlValid } from "../../services/utils";
+import { addOneExperiment } from "../../services/dbFuncs";
 
 /**
  * Add an experiment.
@@ -65,10 +65,10 @@ const addExperiment = async (req: Request, res: Response) => {
             numberOfParticipantsWanted: numberOfParticipantsWanted,
         };
 
-        const result = await collections.experiments?.insertOne(experiment);
+        const result = await addOneExperiment(experiment);
         if (result) {
             res.status(201).send({
-                message: `Experiment added successfully ${result.insertedId}`,
+                message: `Experiment added successfully ${result}`,
             });
         } else {
             logger.warn("Failed to create a new experiment.");

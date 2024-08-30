@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId } from "bson";
-import { collections } from "../../services/connect";
-import Daughter from "../../models/daughter";
 import logger from "../../services/logger";
+import { getExperimentDaughters } from "../../services/dbFuncs";
 
 /**
  * Get all participants' data linked to one experiment you owned.
@@ -13,23 +12,17 @@ import logger from "../../services/logger";
 
 const getParticipantsByExp = async (req: Request, res: Response) => {
     const decoded = req.body?.decoded;
-    const userId = new ObjectId(decoded.userId);
+    const userId = decoded?.userId;
 
     const motherID: string = (req.query?.id as string) || "";
 
-    if (!ObjectId.isValid(motherID)) {
-        logger.warn("Invalide mother id", motherID);
-        res.status(404).json({
-            message:
-                "The experiment id cannot be found in the set of experiments.",
-        });
+    if (!ObjectId.isValid(motherID) || !ObjectId.isValid(userId)) {
+        logger.warn("Invalide motherID", motherID);
+        res.status(404).json({ message: "The motherID cannot be found." });
         return;
     }
 
-    const daughters = (await collections.experiments?.findOne(
-        { _id: new ObjectId(motherID), researcherID: new ObjectId(userId) }
-        //{ projection: { "_id": 0, "name": 1, "daughters": 1 } }
-    )) as unknown as Daughter;
+    const daughters = await getExperimentDaughters(motherID, userId);
 
     res.status(200).json(daughters);
     return;

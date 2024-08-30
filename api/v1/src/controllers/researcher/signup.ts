@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import * as bcrypt from "bcrypt";
-import { Researcher, Role } from "../../models/researcher";
+import { User, Role } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
-import { collections } from "../../services/connect";
 import logger from "../../services/logger";
+import { addUser, getUserByEmail } from "../../services/dbFuncs";
 
 interface NewUserInputModel {
     email: string;
@@ -33,9 +33,7 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
         res.status(401).json({ message: "Incorrect role" });
         return;
     }
-    const existingResearcher = await collections.researchers?.findOne({
-        email: email,
-    });
+    const existingResearcher = await getUserByEmail(email);
 
     if (existingResearcher) {
         logger.warn("Email taken");
@@ -50,7 +48,7 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
         return;
     }
 
-    const researcher: Researcher = {
+    const researcher: User = {
         email: email,
         password: hash,
         role: role,
@@ -58,11 +56,9 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
     };
 
     try {
-        const insertresult = await collections.researchers?.insertOne(
-            researcher
-        );
+        const insertresult = await addUser(researcher);
         res.status(201).json({
-            message: `researcher created with id ${insertresult?.insertedId}`,
+            message: `researcher created with id ${insertresult}`,
         });
     } catch (err) {
         logger.error("Error:", err);

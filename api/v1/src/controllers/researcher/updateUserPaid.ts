@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Researcher } from "../../models/researcher";
 import { collections } from "../../services/connect";
 import logger from "../../services/logger";
+import { getResearcherByEmail, updateUserStatus } from "../../services/dbFuncs";
 
 /**
  * Change the status of one User.
@@ -16,21 +17,14 @@ const changeUserPaidStatus = async (req: Request, res: Response) => {
         const emailUser: string = (req.body?.email as string) ?? "";
 
         //update the status of other experiments based on the user's paid value
-        const researcher = (await collections.researchers?.findOne({
-            email: emailUser,
-        })) as Researcher;
+        const researcher = getResearcherByEmail(emailUser);
 
         if (!researcher) {
             logger.warn("Invalide user account");
             res.status(409).json({ message: "Invalide user account" });
             return;
         }
-        await collections.researchers?.updateOne(
-            {
-                email: emailUser,
-            },
-            { $set: { paid: newStatus } }
-        );
+        await updateUserStatus(emailUser, newStatus);
 
         res.status(201).json({
             message: `Status changed - ${emailUser}'s paid status is now ${newStatus}`,

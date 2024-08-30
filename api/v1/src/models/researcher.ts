@@ -6,7 +6,7 @@ export enum Role {
     RESEARCHER = "RESEARCHER",
     ADMIN = "ADMIN",
 }
-export interface Researcher {
+export interface User {
     _id?: ObjectId;
     email: string;
     password: string;

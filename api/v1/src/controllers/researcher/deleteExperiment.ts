@@ -3,6 +3,7 @@ import { Experiment } from "../../models/experiment";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import logger from "../../services/logger";
+import { getExperimentById } from "../../services/dbFuncs";
 
 /**
  * Delete one experiment you owned.
@@ -11,32 +12,28 @@ import logger from "../../services/logger";
  */
 
 const deleteExperiment = async (req: Request, res: Response) => {
-    const userId: string = (req.body?.decoded?.userId as string) ?? "";
-    const id: string = (req.body?.id as string) ?? "";
+    const userId = req.body?.decoded?.userId;
+    const experimentId = req.body?.id;
 
-    if (!ObjectId.isValid(id) || !ObjectId.isValid(userId)) {
+    if (!ObjectId.isValid(experimentId) || !ObjectId.isValid(userId)) {
         logger.warn("Invalid id.");
         res.status(409).json({ message: "Invalid id." });
         return;
     }
 
     //Check if exists and break if not
-    const experiment = (await collections.experiments?.findOne({
-        _id: new ObjectId(id),
-        researcherID: new ObjectId(userId),
-    })) as Experiment;
+    const experiment = await getExperimentById(experimentId);
 
     if (!experiment) {
-        logger.warn("This experiment does not exist.");
-        res.status(404).json({ message: "This experiment does not exist." });
+        logger.warn(`This experiment ${experimentId} does not exist.`);
+        res.status(404).json({
+            message: `This experiment ${experimentId} does not exist.`,
+        });
         return;
     }
 
     //update the status
-    await collections.experiments?.deleteOne({
-        _id: new ObjectId(id),
-        researcherID: new ObjectId(userId),
-    });
+    await deleteExperiment(userId, experimentId);
 
     res.status(200).json({ message: "Experiment has been deleted." });
     return;

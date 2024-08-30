@@ -2,10 +2,9 @@ import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import * as bcrypt from "bcrypt";
 import endpoint from "../../../endpoints.config";
-import { collections } from "../../services/connect";
-import { Researcher } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
+import { getUserByEmail } from "../../services/dbFuncs";
 
 interface UserInputModel {
     email: string;
@@ -13,19 +12,17 @@ interface UserInputModel {
 }
 
 const login = async (req: Wrapper<UserInputModel>, res: Response) => {
-    const email: string = req.body.email as string;
+    const userEmail: string = req.body.email as string;
     const password: string = req.body.password as string;
     console.log(req.body);
 
-    if (!email || !password) {
+    if (!userEmail || !password) {
         logger.warn("Missing information while loging");
         res.status(401).json({ message: "Missing information" });
         return;
     }
 
-    const user = (await collections.researchers?.findOne({
-        email: email,
-    })) as unknown as Researcher;
+    const user = await getUserByEmail(userEmail);
 
     if (!user) {
         logger.warn("Invalide credentials");

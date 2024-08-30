@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { Researcher, Role } from "../../models/researcher";
+import { Role } from "../../models/researcher";
 import { collections } from "../../services/connect";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
+import { getUserByEmail, updateUserRole } from "../../services/dbFuncs";
 
 interface UserRoleInput {
     role: string;
@@ -31,22 +32,15 @@ const changeUserRoleStatus = async (
         return;
     }
 
-    const researcher = (await collections.researchers?.findOne({
-        email: emailUser,
-    })) as Researcher;
+    const user = getUserByEmail(emailUser);
 
-    if (!researcher) {
+    if (!user) {
         logger.warn("Invalide user account");
         res.status(404).json({ message: "Invalide user account" });
         return;
     }
 
-    await collections.researchers?.updateOne(
-        {
-            email: emailUser,
-        },
-        { $set: { role: newRole } }
-    );
+    await updateUserRole(emailUser, newRole);
 
     res.status(201).json({
         message: `Role changed - ${emailUser}'s role status is now ${newRole}`,

@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import { Experiment, Status } from "../../models/experiment";
-import { Researcher } from "../../models/researcher";
+import { User } from "../../models/researcher";
 import { ObjectId } from "bson";
-import { collections } from "../../services/connect";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
+import {
+    disableExperiments,
+    getExperimentById,
+    getUserById,
+    updateExperimentStatus,
+} from "../../services/dbFuncs";
 
 interface ExpNewInputModel {
     decoded: any;
@@ -24,7 +29,7 @@ const changeExperimentStatus = async (
 ) => {
     const userId: string = req.body.decoded.userId;
     const newStatus: Status = req.body.status.toUpperCase() as Status;
-    const idExperiment: string = req.body.id;
+    const experimentId: string = req.body.id;
 
     if (!Object.values(Status).includes(newStatus)) {
         logger.warn("Invalide status");
@@ -34,17 +39,15 @@ const changeExperimentStatus = async (
         return;
     }
 
-    // check the validity of the id
-    if (!ObjectId.isValid(idExperiment)) {
+    // check the validity of the ids
+    if (!ObjectId.isValid(experimentId) || !ObjectId.isValid(userId)) {
         logger.warn("Invalide id");
         res.status(409).json({ message: "Invalide id" });
         return;
     }
 
-    //Check if exists and break if not
-    const experiment = (await collections.experiments?.findOne({
-        _id: new ObjectId(String(idExperiment)),
-    })) as Experiment;
+    //Check if exists, breaks if not
+    const experiment = await getExperimentById(experimentId);
 
     if (!experiment) {
         logger.warn("Invalide id");
@@ -53,34 +56,23 @@ const changeExperimentStatus = async (
     }
 
     //update the status of other experiments based on the user's paid value
-    const researcher = (await collections.researchers?.findOne({
-        _id: new ObjectId(userId),
-    })) as Researcher;
-
-    if (!researcher) {
+    const user = await getUserById(userId);
+    if (!user) {
         logger.warn("Invalide user account");
         res.status(409).json({ message: "Invalide user account" });
         return;
     }
 
     //if no a paid user - only one experiment can run at  the time
-    if (researcher.paid === false && newStatus === Status.ACTIVE) {
-        await collections.experiments?.updateMany(
-            {
-                researcherID: new ObjectId(userId),
-                status: Status.ACTIVE,
-            },
-            { $set: { status: Status.INACTIVE } }
-        );
+    if (user.paid === false && newStatus === Status.ACTIVE) {
+        await disableExperiments(userId);
     }
 
     //update the status
-    await collections.experiments?.updateOne(
-        { _id: new ObjectId(idExperiment) },
-        { $set: { status: newStatus } }
-    );
+    await updateExperimentStatus(experimentId, newStatus);
+
     res.status(201).json({
-        message: `Status changed - ${idExperiment} is now ${newStatus}`,
+        message: `Status changed - ${experimentId} is now ${newStatus}`,
     });
     return;
 };
