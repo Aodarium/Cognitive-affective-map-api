@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import endpoint from "../../../endpoints.config";
-import { collections } from "../../services/connect";
-import { ObjectId } from "bson";
 import { ExperimentDB } from "../../services/dbFuncs";
 
 /**

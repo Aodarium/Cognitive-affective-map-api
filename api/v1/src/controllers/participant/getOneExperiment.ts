@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import { ObjectId } from "bson";
 import endpoint from "../../../endpoints.config";
-import { collections } from "../../services/connect";
-import { Experiment, Status } from "../../models/experiment";
+import { Status } from "../../models/experiment";
 import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
