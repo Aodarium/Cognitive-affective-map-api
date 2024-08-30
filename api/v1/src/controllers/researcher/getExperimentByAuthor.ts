@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId } from "bson";
-import { getExperimentsByUser } from "../../services/dbFuncs";
 import logger from "../../services/logger";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Get all experiments by author.
@@ -17,7 +17,7 @@ const getExperimentByAuthor = async (req: Request, res: Response) => {
         res.status(404).json({ message: "The userId cannot be found." });
         return;
     }
-    const experiments = await getExperimentsByUser(userId);
+    const experiments = await ExperimentDB.getExperimentsByUser(userId);
 
     res.status(200).json({ experiments });
     return;

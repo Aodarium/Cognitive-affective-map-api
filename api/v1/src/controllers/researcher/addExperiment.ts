@@ -3,7 +3,7 @@ import { ObjectId } from "bson";
 import { Experiment, Status } from "../../models/experiment";
 import logger from "../../services/logger";
 import { isNameValid, isNumberValid, isUrlValid } from "../../services/utils";
-import { addOneExperiment } from "../../services/dbFuncs";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Add an experiment.
@@ -65,7 +65,7 @@ const addExperiment = async (req: Request, res: Response) => {
             numberOfParticipantsWanted: numberOfParticipantsWanted,
         };
 
-        const result = await addOneExperiment(experiment);
+        const result = await ExperimentDB.addOneExperiment(experiment);
         if (result) {
             res.status(201).send({
                 message: `Experiment added successfully ${result}`,

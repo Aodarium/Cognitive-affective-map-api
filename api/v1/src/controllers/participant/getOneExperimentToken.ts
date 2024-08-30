@@ -3,6 +3,7 @@ import { verify } from "jsonwebtoken";
 import endpoint from "../../../endpoints.config";
 import { collections } from "../../services/connect";
 import { ObjectId } from "bson";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Get one experiment's data by token.
@@ -23,15 +24,10 @@ const getOneExperimentToken = async (req: Request, res: Response) => {
 
     const experimentId = decoded.motherID;
 
-    const experimentArray = (await collections.experiments
-        ?.aggregate([
-            { $match: { _id: new ObjectId(experimentId) } },
-            { $unwind: "$daughters" },
-            { $match: { "daughters.jwt": token } },
-            { $set: { cam: "$daughters.cam" } },
-            { $project: { cam: 1 } },
-        ])
-        .toArray()) as any[];
+    const experimentArray = await ExperimentDB.getExperimentToken(
+        experimentId,
+        token
+    );
 
     // No experiment found
     if (experimentArray?.length == 0) {

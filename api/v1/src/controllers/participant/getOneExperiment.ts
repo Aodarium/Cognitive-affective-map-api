@@ -4,6 +4,7 @@ import { ObjectId } from "bson";
 import endpoint from "../../../endpoints.config";
 import { collections } from "../../services/connect";
 import { Experiment, Status } from "../../models/experiment";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Get one experiment by id.
@@ -15,21 +16,19 @@ import { Experiment, Status } from "../../models/experiment";
 
 const getOneExperiment = async (req: Request, res: Response) => {
     const idExpToFetch: string = (req.query?.id as string) ?? "";
-    const participantID: string = (req.query?.participantID as string) ?? "";
+    const participantId: string = (req.query?.participantId as string) ?? "";
 
     if (!ObjectId.isValid(idExpToFetch)) {
         return res.status(404).json({ message: "Experiment unknown." });
     }
 
     // fetch the experiment
-    const experiment: Experiment = (await collections.experiments?.findOne({
-        _id: new ObjectId(idExpToFetch),
-    })) as Experiment;
+    const experiment = await ExperimentDB.getExperimentById(idExpToFetch);
 
     // return the experiment's data
     const token = sign(
         {
-            participantID: participantID,
+            participantId: participantId,
             motherID: idExpToFetch,
         },
         endpoint.KEY_JWT,

@@ -1,15 +1,9 @@
-import { Request, Response } from "express";
-import { Experiment, Status } from "../../models/experiment";
-import { User } from "../../models/researcher";
+import { Response } from "express";
+import { Status } from "../../models/experiment";
 import { ObjectId } from "bson";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
-import {
-    disableExperiments,
-    getExperimentById,
-    getUserById,
-    updateExperimentStatus,
-} from "../../services/dbFuncs";
+import { ExperimentDB, UserDB } from "../../services/dbFuncs";
 
 interface ExpNewInputModel {
     decoded: any;
@@ -47,7 +41,7 @@ const changeExperimentStatus = async (
     }
 
     //Check if exists, breaks if not
-    const experiment = await getExperimentById(experimentId);
+    const experiment = await ExperimentDB.getExperimentById(experimentId);
 
     if (!experiment) {
         logger.warn("Invalide id");
@@ -56,7 +50,7 @@ const changeExperimentStatus = async (
     }
 
     //update the status of other experiments based on the user's paid value
-    const user = await getUserById(userId);
+    const user = await UserDB.getUserById(userId);
     if (!user) {
         logger.warn("Invalide user account");
         res.status(409).json({ message: "Invalide user account" });
@@ -65,11 +59,11 @@ const changeExperimentStatus = async (
 
     //if no a paid user - only one experiment can run at  the time
     if (user.paid === false && newStatus === Status.ACTIVE) {
-        await disableExperiments(userId);
+        await ExperimentDB.disableExperiments(userId);
     }
 
     //update the status
-    await updateExperimentStatus(experimentId, newStatus);
+    await ExperimentDB.updateExperimentStatus(experimentId, newStatus);
 
     res.status(201).json({
         message: `Status changed - ${experimentId} is now ${newStatus}`,

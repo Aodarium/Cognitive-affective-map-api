@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { Role } from "../../models/researcher";
-import { collections } from "../../services/connect";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
-import { getUserByEmail, updateUserRole } from "../../services/dbFuncs";
+import { UserDB } from "../../services/dbFuncs";
 
 interface UserRoleInput {
     role: string;
@@ -32,7 +31,7 @@ const changeUserRoleStatus = async (
         return;
     }
 
-    const user = getUserByEmail(emailUser);
+    const user = UserDB.getUserByEmail(emailUser);
 
     if (!user) {
         logger.warn("Invalide user account");
@@ -40,7 +39,7 @@ const changeUserRoleStatus = async (
         return;
     }
 
-    await updateUserRole(emailUser, newRole);
+    await UserDB.updateUserRole(emailUser, newRole);
 
     res.status(201).json({
         message: `Role changed - ${emailUser}'s role status is now ${newRole}`,

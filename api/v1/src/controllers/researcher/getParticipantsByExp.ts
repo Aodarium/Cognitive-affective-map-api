@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId } from "bson";
 import logger from "../../services/logger";
-import { getExperimentDaughters } from "../../services/dbFuncs";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Get all participants' data linked to one experiment you owned.
@@ -22,7 +22,10 @@ const getParticipantsByExp = async (req: Request, res: Response) => {
         return;
     }
 
-    const daughters = await getExperimentDaughters(motherID, userId);
+    const daughters = await ExperimentDB.getExperimentDaughters(
+        motherID,
+        userId
+    );
 
     res.status(200).json(daughters);
     return;

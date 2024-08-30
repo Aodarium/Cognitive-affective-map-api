@@ -3,7 +3,7 @@ import { Experiment } from "../../models/experiment";
 import { ObjectId } from "bson";
 import { collections } from "../../services/connect";
 import logger from "../../services/logger";
-import { getExperimentById } from "../../services/dbFuncs";
+import { ExperimentDB } from "../../services/dbFuncs";
 
 /**
  * Delete one experiment you owned.
@@ -22,7 +22,7 @@ const deleteExperiment = async (req: Request, res: Response) => {
     }
 
     //Check if exists and break if not
-    const experiment = await getExperimentById(experimentId);
+    const experiment = await ExperimentDB.getExperimentById(experimentId);
 
     if (!experiment) {
         logger.warn(`This experiment ${experimentId} does not exist.`);

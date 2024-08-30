@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { ObjectId } from "bson";
-import { collections } from "../../services/connect";
 import Daughter from "../../models/daughter";
 import { Status } from "../../models/experiment";
+import { ParticipantDB, ExperimentDB } from "../../services/dbFuncs";
+import Participant from "../../models/participant";
 
 /**
  * Add one experiment by participant.
@@ -15,41 +16,39 @@ const submitExperiment = async (req: Request, res: Response) => {
     //get the participant's token
     const cam: string = (req.body?.cam as string) ?? "";
     const token: string = (req?.body?.jwt as string) ?? "";
-    const idMother: string = (req.body?.decoded?.motherID as string) ?? "";
-    const participantID: string =
-        (req.body?.decoded?.participantID as string) ?? "";
+    const motherId = req.body?.decoded?.motherID;
+    const participantId = req.body?.decoded?.participantId;
 
-    if (!cam || !idMother || !participantID || !token) {
+    if (!cam || !motherId || !participantId || !token) {
         return res
             .status(404)
             .json({ message: "Please submit a correct input." });
     }
 
     // check the validity of the id
-    if (!ObjectId.isValid(idMother)) {
+    if (!ObjectId.isValid(motherId)) {
         return res.status(409).json({ message: "Invalid id" });
     }
 
-    const existParticipant = await collections.participants?.findOne({
-        participantID: participantID,
-        idMother: new ObjectId(idMother),
-    });
+    const existParticipant = await ParticipantDB.getOneParticipant(
+        participantId,
+        motherId
+    );
 
     if (existParticipant) {
         return res.status(401).json({ message: "Participation already done." });
     }
 
     //Checks if mother exist and breaks if not
-    const experimentMother = await collections.experiments?.findOne({
-        _id: new ObjectId(idMother),
-    });
+    const experimentMother = await ExperimentDB.getExperimentById(motherId);
+
     if (!experimentMother) {
         return res.status(404).json({ message: "The study cannot be found." });
     }
 
     //Insert the daughter's data into the mother's experiment
     const daughter: Daughter = {
-        participantID: participantID,
+        participantId: participantId,
         jwt: token,
         creationDate: new Date(),
         cam: JSON.stringify(cam),
@@ -62,18 +61,15 @@ const submitExperiment = async (req: Request, res: Response) => {
     ) {
         status = Status.COMPLETE;
     }
-    collections.experiments?.updateOne({ _id: new ObjectId(idMother) }, [
-        { $push: { daughters: daughter as any } },
-        { $set: { status: status as string } },
-    ]);
+    await ParticipantDB.addParticipantDaughter(motherId, daughter, status);
 
-    const participant = {
-        participantID: participantID,
-        idMother: new ObjectId(idMother),
+    const participant: Participant = {
+        participantId: participantId,
+        motherId: motherId,
     };
 
     // Add participant to participants' list
-    await collections.participants?.insertOne(participant);
+    await ParticipantDB.addParticipantId(participant);
 
     return res.status(201).json({ message: "Daughter successfully added." });
 };

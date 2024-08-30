@@ -3,7 +3,7 @@ import * as bcrypt from "bcrypt";
 import { User, Role } from "../../models/researcher";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
-import { addUser, getUserByEmail } from "../../services/dbFuncs";
+import { UserDB } from "../../services/dbFuncs";
 
 interface NewUserInputModel {
     email: string;
@@ -33,7 +33,7 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
         res.status(401).json({ message: "Incorrect role" });
         return;
     }
-    const existingResearcher = await getUserByEmail(email);
+    const existingResearcher = await UserDB.getUserByEmail(email);
 
     if (existingResearcher) {
         logger.warn("Email taken");
@@ -56,7 +56,7 @@ const signup = async (req: Wrapper<NewUserInputModel>, res: Response) => {
     };
 
     try {
-        const insertresult = await addUser(researcher);
+        const insertresult = await UserDB.addUser(researcher);
         res.status(201).json({
             message: `researcher created with id ${insertresult}`,
         });

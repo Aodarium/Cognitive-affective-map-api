@@ -4,7 +4,7 @@ import * as bcrypt from "bcrypt";
 import endpoint from "../../../endpoints.config";
 import { Wrapper } from "../../models/generals";
 import logger from "../../services/logger";
-import { getUserByEmail } from "../../services/dbFuncs";
+import { UserDB } from "../../services/dbFuncs";
 
 interface UserInputModel {
     email: string;
@@ -22,7 +22,7 @@ const login = async (req: Wrapper<UserInputModel>, res: Response) => {
         return;
     }
 
-    const user = await getUserByEmail(userEmail);
+    const user = await UserDB.getUserByEmail(userEmail);
 
     if (!user) {
         logger.warn("Invalide credentials");
