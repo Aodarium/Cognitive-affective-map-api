@@ -8,7 +8,7 @@
         "@types/mongodb": "^4.0.7",
         "@types/morgan": "^1.9.4",
         "@typescript-eslint/parser": "^5.60.1",
-        "axios": "^1.6.7",
+        "axios": "^1.7.4",
         "bcrypt": "^5.0.1",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
